@@ -2,6 +2,7 @@
    import { createEventDispatcher, beforeUpdate } from 'svelte';
    import Bit from "./Bit.svelte";
    export let valor = 0x0;
+   export let nbits = 32;
    export let cores = '00000000000000000000000000000000';
    const dispatch = createEventDispatcher();
 
@@ -31,10 +32,10 @@
       valor = valor >>> 0;
       bits = [];
       let bin = valor.toString(2);
-      while(bin.length < 32) {
+      while(bin.length < nbits) {
          bin = "0" + bin;
       }
-      for(let i=0; i<32; i++) {
+      for(let i=0; i<nbits; i++) {
          let bgcolor = 'ivory';
          if(i < cores.length) {
             let j = parseInt(cores.charAt(i));
@@ -42,7 +43,7 @@
          }
          bits.push({
             valor: bin.charAt(i),
-            indice: 31-i,
+            indice: nbits-1-i,
             bgcolor: bgcolor
          });
       }

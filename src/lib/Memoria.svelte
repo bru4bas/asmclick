@@ -13,26 +13,13 @@
 <div class="mem">
    <p>Memória</p>
    <table class="mem">
+{#each dados as d, i}
       <tr>
-         <td>[pc]</td>
-         <td><InputHex bind:valor={dados[0]} on:change={change}/>
-         <td><InputBin bind:valor={dados[0]} on:change={change}/>
+         <td>[pc{i==0? '': `+${i}`}]</td>
+         <td><InputHex bind:valor={dados[i]} on:change={change}/>
+         <td><InputBin bind:valor={dados[i]} on:change={change}/>
       </tr>
-      <tr>
-         <td>[pc+1]</td>
-         <td><InputHex bind:valor={dados[1]} on:change={change}/>
-         <td><InputBin bind:valor={dados[1]} on:change={change}/>
-      </tr>
-      <tr>
-         <td>[pc+2]</td>
-         <td><InputHex bind:valor={dados[2]} on:change={change}/>
-         <td><InputBin bind:valor={dados[2]} on:change={change}/>
-      </tr>
-      <tr>
-         <td>[pc+3]</td>
-         <td><InputHex bind:valor={dados[3]} on:change={change}/>
-         <td><InputBin bind:valor={dados[3]} on:change={change}/>
-      </tr>
+{/each}
    </table>
 </div>
 
