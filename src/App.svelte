@@ -4,6 +4,7 @@
    import { arm_disasm } from './lib/arm_dis.js';
    import { thumb_disasm } from './lib/thumb_dis.js';
    import Memoria from './lib/Memoria.svelte';
+   import Linkgithub from './lib/Linkgithub.svelte';
 
    let valores = [0, 0, 0, 0];
 
@@ -92,6 +93,7 @@
 </div>
 
 <Memoria dados={valores} on:change={valores_change}/>
+<Linkgithub />
 </div>
 
 <style>
