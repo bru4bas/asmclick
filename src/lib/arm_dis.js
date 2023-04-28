@@ -99,6 +99,9 @@ function trata_operando(bits) {
    };
 }
 
+/**
+ * Processa lista de registradores.
+ */
 function trata_rlist(bits) {
    let res = '';
    let mask = 1;
@@ -253,6 +256,106 @@ function trata_ldst(bits) {
 }
 
 /**
+ * Trata instruções LOAD/STORE de 16 bits.
+ */
+function trata_ldsth(bits) {
+   let rn = (bits & 0x000f0000) >> 16;
+   let rd = (bits & 0x0000f000) >> 12;
+   let res;
+   let msk;
+   let positivo = false;
+   let pre = false;
+   if((bits & 0x00800000) == 0x00800000) positivo = true;
+   if((bits & 0x01000000) == 0x01000000) pre = true;
+
+   if((bits & 0x00100000) == 0x00100000) res = "ldr";
+   else res = "str";
+   res += trata_cond(bits);
+   
+   if((bits & 0x00100000) == 0x00100000) {
+      let sh = ((bits & 0x00000060) >> 5);
+      res += [
+         'h',
+         'h',
+         'sb',
+         'sh'][sh];
+   } else 
+      res += 'h';
+
+   res += ` r${rd}, [r${rn}`;
+   if(!pre) res += ']';
+
+   /*
+    * Registrador
+    */
+   let rm = bits & 0x0000000f;
+   if(positivo) res += `, r${rm}`;
+   else res += `, -r${rm}`;
+   msk = "11110002323244445555000003406666";
+
+   if(pre) {
+      res += ']';
+      if((bits & 0x00200000) == 0x00200000) res += '!';
+   }
+
+   return {
+      instrucao: res,
+      mask: msk
+   };
+}
+
+/**
+ * Trata instruções LOAD/STORE de 16 bits.
+ */
+function trata_ldsth_imm(bits) {
+   let rn = (bits & 0x000f0000) >> 16;
+   let rd = (bits & 0x0000f000) >> 12;
+   let res;
+   let msk;
+   let positivo = false;
+   let pre = false;
+   if((bits & 0x00800000) == 0x00800000) positivo = true;
+   if((bits & 0x01000000) == 0x01000000) pre = true;
+
+   if((bits & 0x00100000) == 0x00100000) res = "ldr";
+   else res = "str";
+   res += trata_cond(bits);
+   
+   if((bits & 0x00100000) == 0x00100000) {
+      let sh = ((bits & 0x00000060) >> 5);
+      res += [
+         'h',
+         'h',
+         'sb',
+         'sh'][sh];
+   } else 
+      res += 'h';
+
+   res += ` r${rd}, [r${rn}`;
+   if(!pre) res += ']';
+
+   /*
+    * Valor de 8 bits imediato
+    */
+   let offset = (bits & 0x00000f00) >> 4;
+   offset |= (bits & 0x0000000f);
+   if(offset > 0) {
+      if(positivo) res += `, #${offset}`;
+      else res += `, -#${offset}`;
+   }
+   msk = "11110002323244445555222203402222";
+
+   if(pre) {
+      res += ']';
+      if((bits & 0x00200000) == 0x00200000) res += '!';
+   }
+
+   return {
+      instrucao: res,
+      mask: msk
+   };
+}
+/**
  * Trata instrução MRS.
  */
 function trata_mrs(bits) {
@@ -383,6 +486,8 @@ export function arm_disasm(bits) {
    if((bits & 0x0e000000) == 0x0a000000) return trata_b(bits);
    if((bits & 0x0fbf0fff) == 0x010f0000) return trata_mrs(bits);
    if((bits & 0x0fbffff0) == 0x0129f000) return trata_msr(bits);
+   if((bits & 0x0e400f90) == 0x00000090) return trata_ldsth(bits);
+   if((bits & 0x0e400090) == 0x00400090) return trata_ldsth_imm(bits);
    if((bits & 0x0c000000) == 0x00000000) return trata_proc(bits);
    return {
       instrucao: "???",
