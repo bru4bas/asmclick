@@ -69,7 +69,7 @@ function trata_operando(bits) {
        */
       let val = bits & 0x000000ff;
       let n = (bits &  0x00000f00) >> 7;
-      val = (val >> n) | (val << (32 - n));
+      val = ((val >> n) | (val << (32 - n))) >>> 0;
       res = `#0x${val.toString(16)}`;
       msk = '333322222222';
    } else {
