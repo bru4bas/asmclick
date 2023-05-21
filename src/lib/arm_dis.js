@@ -386,6 +386,82 @@ function trata_msr(bits) {
 }
 
 /**
+ * Trata instruções MCR e MRC.
+ */
+function trata_mcr_mrc(bits) {
+   let res = 'mcr';
+   if((bits & 0x00100000) == 0x00100000) res = 'mrc';
+   res += trata_cond(bits);
+   let cp = (bits >> 8) & 0x0f;
+   let op1 = (bits >> 21) & 0x03;
+   let op2 = (bits >> 5) & 0x03;
+   let rd = (bits >> 12) & 0x0f;
+   let crn = (bits >> 16) & 0x0f;
+   let crm = bits & 0x0f;
+   res += ` p${cp}, ${op1}, r${rd}, c${crn}, c${crm}, ${op2}`;
+   return {
+      instrucao: res,
+      mask: "11110000222033335555666622204444"
+   };
+}
+
+/**
+ * Trata instrução CDP.
+ */
+function trata_cdp(bits) {
+   let res = 'cdp';
+   res += trata_cond(bits);
+   let cp = (bits >> 8) & 0x0f;
+   let op1 = (bits >> 20) & 0x0f;
+   let op2 = (bits >> 5) & 0x03;
+   let crd = (bits >> 12) & 0x0f;
+   let crn = (bits >> 16) & 0x0f;
+   let crm = bits & 0x0f;
+   res += ` p${cp}, ${op1}, c${crd}, c${crn}, c${crm}, ${op2}`;
+   return {
+      instrucao: res,
+      mask: "11110000222233335555666622204444"
+   };
+}
+
+/**
+ * Trata instruções ldc e stc
+ */
+function trata_ldc(bits) {
+   let res = 'stc';
+   if((bits & 0x00100000) == 0x00100000) res = 'ldc';
+   res += trata_cond(bits);
+   if((bits & 0x00400000) == 0x00400000) res += 'l';
+   let rn = (bits & 0x000f0000) >> 16;
+   let crd = (bits & 0x0000f000) >> 12;
+   let cp = (bits >> 8) & 0x0f;
+
+   let positivo = false;
+   let pre = false;
+   if((bits & 0x00800000) == 0x00800000) positivo = true;
+   if((bits & 0x01000000) == 0x01000000) pre = true;
+
+   res += ` p${cp}, c${crd}, [r${rn}`;
+   if(!pre) res += ']';
+
+   let offset = 4 * (bits & 0xff);
+   if(offset > 0) {
+      if(positivo) res += `, #${offset}`;
+      else res += `, -#${offset}`;
+   }
+
+   if(pre) {
+      res += ']';
+      if((bits & 0x00200000) == 0x00200000) res += '!';
+   }
+
+   return {
+      instrucao: res,
+      mask: "11110002323044445555666622222222"
+   };
+}
+
+/**
  * Trata saltos (B e BL).
  */
 function trata_b(bits) {
@@ -486,6 +562,9 @@ export function arm_disasm(bits) {
    if((bits & 0x0e000000) == 0x0a000000) return trata_b(bits);
    if((bits & 0x0fbf0fff) == 0x010f0000) return trata_mrs(bits);
    if((bits & 0x0fbffff0) == 0x0129f000) return trata_msr(bits);
+   if((bits & 0x0f000010) == 0x0e000000) return trata_cdp(bits);
+   if((bits & 0x0f000010) == 0x0e000010) return trata_mcr_mrc(bits);
+   if((bits & 0x0e000000) == 0x0c000000) return trata_ldc(bits);
    if((bits & 0x0e400f90) == 0x00000090) return trata_ldsth(bits);
    if((bits & 0x0e400090) == 0x00400090) return trata_ldsth_imm(bits);
    if((bits & 0x0c000000) == 0x00000000) return trata_proc(bits);
