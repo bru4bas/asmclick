@@ -393,8 +393,8 @@ function trata_mcr_mrc(bits) {
    if((bits & 0x00100000) == 0x00100000) res = 'mrc';
    res += trata_cond(bits);
    let cp = (bits >> 8) & 0x0f;
-   let op1 = (bits >> 21) & 0x03;
-   let op2 = (bits >> 5) & 0x03;
+   let op1 = (bits >> 21) & 0x07;
+   let op2 = (bits >> 5) & 0x07;
    let rd = (bits >> 12) & 0x0f;
    let crn = (bits >> 16) & 0x0f;
    let crm = bits & 0x0f;
@@ -413,7 +413,7 @@ function trata_cdp(bits) {
    res += trata_cond(bits);
    let cp = (bits >> 8) & 0x0f;
    let op1 = (bits >> 20) & 0x0f;
-   let op2 = (bits >> 5) & 0x03;
+   let op2 = (bits >> 5) & 0x07;
    let crd = (bits >> 12) & 0x0f;
    let crn = (bits >> 16) & 0x0f;
    let crm = bits & 0x0f;
