@@ -101,7 +101,7 @@
       margin: 0;
       padding: 50px 30px;
       border-radius: 20px;
-      background-color: whitesmoke;
+      background-color: var(--pannel-bg);
    }
    .instrucao {
       font-size: 2em;

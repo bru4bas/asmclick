@@ -33,7 +33,7 @@
       display: inline-block;
    }
    table.mem {
-      background-color: ghostwhite;
+      background-color: var(--memory-bg);
       font-family: monospace;
       font-size: 1.5em;
       line-height: 1em;

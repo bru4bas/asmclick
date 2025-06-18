@@ -28,6 +28,7 @@
    }
 
    button.bit {
+      color: var(--bit-button-color);
       border-radius: 0;
       padding: 10px;
       font-size: 2em;
